@@ -165,7 +165,6 @@ const searchItems = (options, done) => {
     let params = [];
     
     if (status === 'BID') {
-        // Items user has bid on
         sql = `
             SELECT DISTINCT i.item_id, i.name, i.description, i.end_date, i.creator_id, u.first_name, u.last_name
             FROM items i
@@ -179,7 +178,6 @@ const searchItems = (options, done) => {
             params.push(`%${q}%`, `%${q}%`);
         }
     } else if (status === 'OPEN') {
-        // Items user created that haven't ended
         sql = `
             SELECT i.item_id, i.name, i.description, i.end_date, i.creator_id, u.first_name, u.last_name
             FROM items i
@@ -193,7 +191,6 @@ const searchItems = (options, done) => {
             params.push(`%${q}%`, `%${q}%`);
         }
     } else if (status === 'ARCHIVE') {
-        // Items user created that have ended
         sql = `
             SELECT i.item_id, i.name, i.description, i.end_date, i.creator_id, u.first_name, u.last_name
             FROM items i
@@ -207,7 +204,6 @@ const searchItems = (options, done) => {
             params.push(`%${q}%`, `%${q}%`);
         }
     } else {
-        // All items (no status filter)
         sql = `
             SELECT i.item_id, i.name, i.description, i.end_date, i.creator_id, u.first_name, u.last_name
             FROM items i
