@@ -1,0 +1,280 @@
+/* Global Styles for Auctionary */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #2c3e50;
+    background: #f5f5f5;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+
+/* Headings */
+h1 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+}
+
+h2 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+/* Forms */
+.input-group {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.input-group label {
+    font-weight: 600;
+    min-width: 80px;
+}
+
+.input-group input,
+.input-group select {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: #42b983;
+    box-shadow: 0 0 0 3px rgba(66, 185, 131, 0.1);
+}
+
+/* Buttons */
+button,
+.btn {
+    padding: 0.5rem 1rem;
+    background: #42b983;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s;
+}
+
+button:hover,
+.btn:hover {
+    background: #359268;
+}
+
+button:disabled,
+.btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+button.secondary {
+    background: #6c757d;
+}
+
+button.secondary:hover {
+    background: #5a6268;
+}
+
+button.danger {
+    background: #dc3545;
+}
+
+button.danger:hover {
+    background: #c82333;
+}
+
+/* Cards */
+.card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+}
+
+/* Item Details */
+.item-details {
+    background: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.item-details h2 {
+    margin-top: 0;
+}
+
+/* Info Grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.info-grid > div {
+    padding: 0.75rem;
+    background: white;
+    border-radius: 4px;
+}
+
+.info-grid strong {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Description */
+.description {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: white;
+    border-radius: 4px;
+}
+
+.description p {
+    margin: 0.5rem 0 0 0;
+    line-height: 1.6;
+}
+
+/* Bid Holder */
+.bid-holder {
+    padding: 1rem;
+    background: #e8f5e9;
+    border-radius: 4px;
+    border-left: 4px solid #4caf50;
+}
+
+.no-bids {
+    padding: 1rem;
+    background: #fff3e0;
+    border-radius: 4px;
+    border-left: 4px solid #ff9800;
+}
+
+/* Messages */
+.error {
+    padding: 1rem;
+    background: #ffebee;
+    border-radius: 4px;
+    border-left: 4px solid #f44336;
+    color: #c62828;
+    margin: 1rem 0;
+}
+
+.success {
+    padding: 1rem;
+    background: #e8f5e9;
+    border-radius: 4px;
+    border-left: 4px solid #4caf50;
+    color: #2e7d32;
+    margin: 1rem 0;
+}
+
+.warning {
+    padding: 1rem;
+    background: #fff3e0;
+    border-radius: 4px;
+    border-left: 4px solid #ff9800;
+    color: #e65100;
+    margin: 1rem 0;
+}
+
+.info {
+    padding: 1rem;
+    background: #e3f2fd;
+    border-radius: 4px;
+    border-left: 4px solid #2196f3;
+    color: #0d47a1;
+    margin: 1rem 0;
+}
+
+/* Loading */
+.loading,
+em {
+    color: #666;
+    font-style: italic;
+}
+
+/* Lists */
+ul {
+    list-style: none;
+}
+
+.item-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+thead {
+    background: #f5f5f5;
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+}
+
+th {
+    font-weight: 600;
+    color: #666;
+}
+
+tbody tr {
+    border-bottom: 1px solid #eee;
+}
+
+tbody tr:hover {
+    background: #f9f9f9;
+}
+
+/* Utilities */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+
+.p-1 { padding: 0.5rem; }
+.p-2 { padding: 1rem; }
+.p-3 { padding: 1.5rem; }
+.p-4 { padding: 2rem; }
