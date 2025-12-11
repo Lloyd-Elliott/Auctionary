@@ -1,11 +1,11 @@
 const Joi = require('joi');
 const core = require('../controllers/core.server.controllers.js');
-const { isAuthenticated } = require('../lib/authentication');
+const { isAuthenticated, optionalAuthentication } = require('../lib/authentication');
 
 module.exports = function (app) {
     
     app.route('/search')
-        .get(core.searchItem);
+        .get(optionalAuthentication, core.searchItem);
 
     app.route('/item')
         .post(isAuthenticated,core.createItem);

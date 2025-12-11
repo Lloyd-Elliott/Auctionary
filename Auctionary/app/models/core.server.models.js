@@ -90,7 +90,7 @@ const getItemsUserBids = (userId, done) => {
     });
 };
 
-const getEndedAuctionsByCreator = (creatorId, nowTs, done) => {
+const getEndedAuctionsByCreator = (creatorId, date, done) => {
     const sql = `
         SELECT i.item_id, i.name, i.description, i.end_date, i.creator_id, u.first_name, u.last_name
         FROM items i
@@ -98,7 +98,7 @@ const getEndedAuctionsByCreator = (creatorId, nowTs, done) => {
         WHERE i.creator_id = ? AND i.end_date < ?
         ORDER BY i.item_id ASC
     `;
-    db.all(sql, [creatorId, nowTs], (err, rows) => {
+    db.all(sql, [creatorId, date], (err, rows) => {
         if (err) return done(err);
         return done(null, rows || []);
     });
@@ -158,6 +158,73 @@ const getItemDetailsByID = (itemId, done) => {
     });
 };
 
+const searchItems = (options, done) => {
+    const { q, status, userId, limit, offset } = options;
+    
+    let sql = '';
+    let params = [];
+    
+    if (status === 'BID') {
+        sql = `
+            SELECT DISTINCT i.item_id, i.name, i.description, i.end_date, i.creator_id, u.first_name, u.last_name
+            FROM items i
+            JOIN users u ON i.creator_id = u.user_id
+            WHERE i.item_id IN (SELECT item_id FROM bids WHERE user_id = ?)
+        `;
+        params.push(userId);
+        
+        if (q) {
+            sql += ` AND (i.name LIKE ? OR i.description LIKE ?)`;
+            params.push(`%${q}%`, `%${q}%`);
+        }
+    } else if (status === 'OPEN') {
+        sql = `
+            SELECT i.item_id, i.name, i.description, i.end_date, i.creator_id, u.first_name, u.last_name
+            FROM items i
+            JOIN users u ON i.creator_id = u.user_id
+            WHERE i.creator_id = ? AND i.end_date > ?
+        `;
+        params.push(userId, Date.now());
+        
+        if (q) {
+            sql += ` AND (i.name LIKE ? OR i.description LIKE ?)`;
+            params.push(`%${q}%`, `%${q}%`);
+        }
+    } else if (status === 'ARCHIVE') {
+        sql = `
+            SELECT i.item_id, i.name, i.description, i.end_date, i.creator_id, u.first_name, u.last_name
+            FROM items i
+            JOIN users u ON i.creator_id = u.user_id
+            WHERE i.creator_id = ? AND i.end_date <= ?
+        `;
+        params.push(userId, Date.now());
+        
+        if (q) {
+            sql += ` AND (i.name LIKE ? OR i.description LIKE ?)`;
+            params.push(`%${q}%`, `%${q}%`);
+        }
+    } else {
+        sql = `
+            SELECT i.item_id, i.name, i.description, i.end_date, i.creator_id, u.first_name, u.last_name
+            FROM items i
+            JOIN users u ON i.creator_id = u.user_id
+        `;
+        
+        if (q) {
+            sql += ` WHERE (i.name LIKE ? OR i.description LIKE ?)`;
+            params.push(`%${q}%`, `%${q}%`);
+        }
+    }
+    
+    sql += ` ORDER BY i.item_id ASC LIMIT ? OFFSET ?`;
+    params.push(limit, offset);
+    
+    db.all(sql, params, (err, rows) => {
+        if (err) return done(err);
+        return done(null, rows || []);
+    });
+};
+
 module.exports = {
     createItem: createItem,
     getItemById: getItemById,
@@ -167,6 +234,7 @@ module.exports = {
     getItemsUserBids: getItemsUserBids,
     getEndedAuctionsByCreator: getEndedAuctionsByCreator,
     getHighestBid: getHighestBid,
-    addBid: addBid
+    addBid: addBid,
+    searchItems: searchItems
 };
 

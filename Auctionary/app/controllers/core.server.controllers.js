@@ -2,8 +2,36 @@ const core = require('../models/core.server.models.js');
 const Joi = require('joi');
 
 const searchItem = (req, res) => {
-  return res.sendStatus(500);
-}  
+  const schema = Joi.object({
+    q: Joi.string().min(1).max(100).optional(),
+    status: Joi.string().valid('BID', 'OPEN', 'ARCHIVE').optional(),
+    limit: Joi.number().integer().min(1).max(100).optional(),
+    offset: Joi.number().integer().min(0).optional()
+  });
+
+  const { error, value } = schema.validate(req.query, { allowUnknown: false });
+  if (error) {
+    return res.status(400).json({ error_message: error.details[0].message });
+  }
+
+  // Check if status requires authentication
+  if (value.status && !req.user_id) {
+    return res.status(400).json({ error_message: 'Authentication required for status filter' });
+  }
+
+  const options = {
+    q: value.q || null,
+    status: value.status || null,
+    userId: req.user_id || null,
+    limit: value.limit || 10,
+    offset: value.offset || 0
+  };
+
+  core.searchItems(options, (err, items) => {
+    if (err) return res.sendStatus(500);
+    return res.status(200).json(items);
+  });
+};
 
 const createItem = (req, res) => {
   const creator_id = req.user_id;
