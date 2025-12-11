@@ -30,12 +30,14 @@
 
 <script>
 import * as EmailValidator from 'email-validator';
+import { coreServices } from '../../services/core.services';
   export default{
     data(){
       return{
         email: "",
         password: "",
-        submitted: false
+        submitted: false,
+        error: ""
       }
     },
 
@@ -48,13 +50,7 @@ import * as EmailValidator from 'email-validator';
           return;
         }
 
-
-        console.log("HERE")
-        console.log(EmailValidator.validate(email))
-        console.log(!(EmailValidator.validate(email)))
-
         if(!(EmailValidator.validate(email))){
-          console.log("Im in here")
           this.error = "Email must be a valid email"
           return;
         }
@@ -62,8 +58,19 @@ import * as EmailValidator from 'email-validator';
         const password_pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])(?=^\S+$).{8,30}$/;
         if (!(password_pattern.test(password))){
           this.error = "Password Not Strong Enough"
+          return;
         }
-        alert("Button Clicked")
+
+        // Call login API
+        coreServices.userLogin(email, password)
+          .then((response) => {
+            // Redirect to home or dashboard
+            this.$router.push('/');
+            alert("Login Successful!");
+          })
+          .catch((error) => {
+            this.error = error || "Invalid email or password";
+          });
       }
     }
   }
