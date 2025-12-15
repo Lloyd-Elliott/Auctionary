@@ -17,8 +17,18 @@ body {
 
 /* Navigation */
 nav {
-    text-align: center;
     padding: 20px;
+    text-align: center;
+}
+
+.nav-left {
+    margin-bottom: 15px;
+}
+
+.nav-right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 nav a {
@@ -30,6 +40,37 @@ nav a {
 
 nav a:hover {
     color: #42b983;
+}
+
+/* Login form in nav */
+.login-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-form input {
+    padding: 6px 10px;
+    width: 150px;
+    font-size: 14px;
+}
+
+.login-form button {
+    padding: 6px 15px;
+    font-size: 14px;
+    margin: 0;
+}
+
+.user-info {
+    color: white;
+    font-size: 14px;
+}
+
+.logout-btn {
+    padding: 6px 15px;
+    font-size: 14px;
+    margin-left: 10px;
 }
 
 /* Forms */
