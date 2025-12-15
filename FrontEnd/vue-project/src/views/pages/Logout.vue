@@ -14,7 +14,7 @@
             <router-link to="/">Cancel</router-link>
         </div>
 
-        <div v-if="error" style="color: red; margin-top: 20px;">
+        <div v-if="error" class="error-message">
             <strong>Error:</strong> {{ error }}
         </div>
     </div>

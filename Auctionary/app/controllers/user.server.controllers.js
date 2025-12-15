@@ -3,7 +3,6 @@ const core = require('../models/core.server.models.js');
 const Joi = require('joi');
 
 const createUser = (req, res) => {
-  // Password must be 8-30 chars and include at least one lower, one upper, one digit and one special char
   const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,30}$/;
 
   const schema = Joi.object({
@@ -14,13 +13,18 @@ const createUser = (req, res) => {
   });
 
   const { error, value } = schema.validate(req.body, { allowUnknown: false });
-  if (error) { return res.status(400).json({ error_message: error.details[0].message }); };
-  
-  user.findByEmail(value.email, (err, existingUser) => {
-  if (err) { return res.status(500).send({ message: 'Error checking existing user' }); }
-  if (existingUser) { return res.status(400).json({ error_message: 'User with this email already exists' }); }
+  if (error) {
+    return res.status(400).json({ error_message: error.details[0].message });
+  }
 
-    
+  user.findByEmail(value.email, (err, existingUser) => {
+    if (err) {
+      return res.status(500).send({ message: 'Error checking existing user' });
+    }
+    if (existingUser) {
+      return res.status(400).json({ error_message: 'User with this email already exists' });
+    }
+
     user.create(value, (err, userId) => {
       if (err) {
         if (err.code === 'SQLITE_CONSTRAINT' || /UNIQUE/i.test(err.message || '')) {
@@ -31,7 +35,7 @@ const createUser = (req, res) => {
       return res.status(201).json({ user_id: userId });
     });
   });
-}
+};
 
 
 
@@ -43,7 +47,6 @@ const getUserById = (req, res) => {
     if (err) return res.sendStatus(500);
     if (!userRow) return res.sendStatus(404);
 
-    // assemble selling, bidding_on, auctions_ended
     core.getItemsByCreator(userId, (err1, selling) => {
       if (err1) return res.sendStatus(500);
 
@@ -77,31 +80,31 @@ const userLogin = (req, res) => {
   });
   const { error, value } = schema.validate(req.body, { allowUnknown: false });
   if (error) {
-    console.log('Validation error:', error.details[0].message);
     return res.status(400).send({ error_message: error.details[0].message });
-  }else{
-    let email = req.body.email;
-    let password = req.body.password;
-
-    user.authenticateUser(email, password, function(err, user_id){
-      if(err){
-        console.log('Authentication error:', err);
-        res.status(400).json({ error_message: 'Invalid email or password' } );
-      } else{
-        user.getToken(user_id, function(err,session_token){
-          if(session_token){
-            return res.status(200).send({user_id:user_id, session_token:session_token});
-          } else{
-              user.setToken(user_id, function(err, session_token){
-                  if (err) return res.status(500).json({ error: 'Error setting token' })
-                  res.status(200).send({user_id: user_id, session_token: session_token});
-          });
-        }
-      });
-      }
-    });
   }
-}
+
+  let email = req.body.email;
+  let password = req.body.password;
+
+  user.authenticateUser(email, password, (err, user_id) => {
+    if (err) {
+      return res.status(400).json({ error_message: 'Invalid email or password' });
+    }
+
+    user.getToken(user_id, (err, session_token) => {
+      if (session_token) {
+        return res.status(200).send({ user_id: user_id, session_token: session_token });
+      }
+
+      user.setToken(user_id, (err, session_token) => {
+        if (err) {
+          return res.status(500).json({ error: 'Error setting token' });
+        }
+        return res.status(200).send({ user_id: user_id, session_token: session_token });
+      });
+    });
+  });
+};
 
 
 
@@ -116,7 +119,7 @@ const userLogout = (req, res) => {
     if (err) return res.status(500).json({ error: 'Failed to verify token' });
     if (!row) return res.status(401).json({ error: 'Invalid token' });
 
-    user.removeToken(session_token, function(err, changes) {
+    user.removeToken(session_token, (err, changes) => {
       if (err) {
         return res.status(500).json({ error: 'Failed to log out' });
       }
@@ -125,17 +128,9 @@ const userLogout = (req, res) => {
   });
 };
 
-
-
-
-
-
-
 module.exports = {
   createUser: createUser,
   getUserById: getUserById,
   userLogin: userLogin,
   userLogout: userLogout
 };
-
-

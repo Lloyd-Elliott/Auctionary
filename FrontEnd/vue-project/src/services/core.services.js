@@ -4,7 +4,7 @@ const getItemById = (itemId) => {
             if(response.status === 200){
                 return response.json();
             } else {
-                throw `Failed to fetch item: ${response.status}`;
+                throw `Failed to fetch item: This Item May not Exist, Please try another ID`;
             }
         })
         .then((resJson) => {
@@ -63,7 +63,6 @@ const userLogin = (email, password) => {
             }
         })
         .then((data) => {
-            // Store user session
             localStorage.setItem('user_id', data.user_id);
             localStorage.setItem('session_token', data.session_token);
             return data;
@@ -97,14 +96,12 @@ const userLogout = () => {
             }
         })
         .then((data) => {
-            // Clear user session
             localStorage.removeItem('user_id');
             localStorage.removeItem('session_token');
             return data;
         })
         .catch((error) => {
             console.error(error);
-            // Clear local storage even if API call fails
             localStorage.removeItem('user_id');
             localStorage.removeItem('session_token');
             return Promise.reject(error);
@@ -164,6 +161,132 @@ const createItem = (itemData) => {
         }); 
 }
 
+const placeBid = (itemId, amount) => {
+    const session_token = localStorage.getItem('session_token');
+    
+    if (!session_token) {
+        return Promise.reject('Must be logged in to place a bid');
+    }
+
+    return fetch(`http://localhost:3333/item/${itemId}/bid`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Authorization': session_token
+        },
+        body: JSON.stringify({ amount })
+    })
+        .then((response) => {
+            if(response.status === 201){
+                return { success: true };
+            } else if(response.status === 400 || response.status === 403 || response.status === 404){
+                return response.json().then(err => {
+                    throw err.error_message || 'Failed to place bid';
+                });
+            } else {
+                throw 'Failed to place bid';
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            return Promise.reject(error);
+        }); 
+}
+
+const getQuestions = (itemId) => {
+    return fetch(`http://localhost:3333/item/${itemId}/question`)
+        .then((response) => {
+            if(response.status === 200){
+                return response.json();
+            } else {
+                throw `Failed to fetch questions`;
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            return Promise.reject(error);
+        }); 
+}
+
+const askQuestion = (itemId, questionText) => {
+    const session_token = localStorage.getItem('session_token');
+    
+    if (!session_token) {
+        return Promise.reject('Must be logged in to ask a question');
+    }
+
+    return fetch(`http://localhost:3333/item/${itemId}/question`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Authorization': session_token
+        },
+        body: JSON.stringify({ question_text: questionText })
+    })
+        .then((response) => {
+            if(response.status === 200){
+                return response.json();
+            } else if(response.status === 400 || response.status === 403 || response.status === 404){
+                return response.json().then(err => {
+                    throw err.error_message || 'Failed to submit question';
+                });
+            } else {
+                throw 'Failed to submit question';
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            return Promise.reject(error);
+        }); 
+}
+
+const answerQuestion = (questionId, answerText) => {
+    const session_token = localStorage.getItem('session_token');
+    
+    if (!session_token) {
+        return Promise.reject('Must be logged in to answer a question');
+    }
+
+    return fetch(`http://localhost:3333/question/${questionId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Authorization': session_token
+        },
+        body: JSON.stringify({ answer_text: answerText })
+    })
+        .then((response) => {
+            if(response.status === 200){
+                return { success: true };
+            } else if(response.status === 400 || response.status === 403 || response.status === 404){
+                return response.json().then(err => {
+                    throw err.error_message || 'Failed to submit answer';
+                });
+            } else {
+                throw 'Failed to submit answer';
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            return Promise.reject(error);
+        }); 
+}
+
+const getBids = (itemId) => {
+    return fetch(`http://localhost:3333/item/${itemId}/bid`)
+        .then((response) => {
+            if(response.status === 200){
+                return response.json();
+            } else {
+                throw `Failed to fetch bids`;
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            return Promise.reject(error);
+        }); 
+}
+
 export const coreServices = {
     getItemById,
     searchItem,
@@ -171,4 +294,9 @@ export const coreServices = {
     userLogout,
     createUser,
     createItem,
+    placeBid,
+    getQuestions,
+    askQuestion,
+    answerQuestion,
+    getBids,
 };

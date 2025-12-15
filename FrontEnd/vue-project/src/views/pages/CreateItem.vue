@@ -2,7 +2,7 @@
     <div class="container">
         <h1>Create New Auction Item</h1>
         
-        <div v-if="!isLoggedIn" style="color: #ff6b6b;">
+        <div v-if="!isLoggedIn" class="error-message">
             <p>You must be logged in to create an item.</p>
             <router-link to="/login">Login here</router-link>
         </div>
@@ -39,11 +39,11 @@
             <button type="submit">Create Item</button>
         </form>
 
-        <div v-if="error" style="color: red; margin-top: 20px;">
+        <div v-if="error" class="error-message">
             <strong>Error:</strong> {{ error }}
         </div>
 
-        <div v-if="success" style="color: #42b983; margin-top: 20px;">
+        <div v-if="success" class="success-message">
             <strong>Success!</strong> Item created with ID: {{ createdItemId }}
             <br />
             <router-link :to="`/get-item?id=${createdItemId}`">View item</router-link>
@@ -79,9 +79,10 @@ export default {
             this.success = false;
 
             try {
-                // Convert datetime-local to ISO string for the backend
                 const itemData = {
-                    ...this.formData,
+                    name: this.formData.name,
+                    description: this.formData.description,
+                    starting_bid: this.formData.starting_bid,
                     end_date: new Date(this.formData.end_date).toISOString()
                 };
 
@@ -90,7 +91,6 @@ export default {
                 this.success = true;
                 this.createdItemId = response.item_id;
                 
-                // Reset form
                 this.formData = {
                     name: '',
                     description: '',
@@ -107,14 +107,5 @@ export default {
 </script>
 
 <style scoped>
-textarea {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    background-color: white;
-    color: #2c3e50;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-family: Arial, sans-serif;
-}
+
 </style>

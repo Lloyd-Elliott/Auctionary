@@ -21,8 +21,8 @@
         <button type="submit">Login</button>
     </form>
 
-    <div v-if="error" style="color: red; margin-top: 20px;">
-      <strong>Error:</strong> {{ error }}
+    <div v-if="error" class="error-message">
+        <strong>Error:</strong> {{ error }}
     </div>
   </div>
 </template>
@@ -60,10 +60,8 @@ import { coreServices } from '../../services/core.services';
           return;
         }
 
-        // Call login API
         coreServices.userLogin(email, password)
           .then((response) => {
-            // Redirect to home or dashboard
             this.$router.push('/');
             alert("Login Successful!");
           })

@@ -6,6 +6,8 @@
         <router-link to="/">Home</router-link> |
         <router-link to="/get-item">Get Item</router-link> |
         <router-link to="/create-item">Create Item</router-link> |
+        <router-link to="/my-items">My Items</router-link> |
+        <router-link to="/questions">Questions</router-link> |
         <router-link to="/register">Register</router-link>
       </div>
       
@@ -22,8 +24,8 @@
       </div>
     </nav>
     
-    <div v-if="loginError" style="color: red; text-align: center; padding: 10px;">
-      {{ loginError }}
+    <div v-if="loginError" class="error-message" style="text-align: center; padding: 10px;">
+      {{ loginError }} <router-link to="/register">Register here</router-link>
     </div>
     
     <router-view />
@@ -39,12 +41,18 @@ export default {
       email: '',
       password: '',
       loginError: null,
-      userId: localStorage.getItem('user_id')
+      userId: localStorage.getItem('user_id'),
+      userName: localStorage.getItem('user_name') || 'User'
     }
   },
   computed: {
     isLoggedIn() {
       return !!localStorage.getItem('session_token');
+    }
+  },
+  watch: {
+    '$route'() {
+      this.loginError = null;
     }
   },
   methods: {
@@ -61,17 +69,19 @@ export default {
         this.userId = response.user_id;
         this.email = '';
         this.password = '';
-        this.$forceUpdate(); // Force re-render to update isLoggedIn
+        this.$router.go(0); // Reload the current page
       } catch (error) {
-        this.loginError = error || "Login failed";
+        this.loginError = "Invalid email or password. Please try again or ";
+        this.email = '';
+        this.password = '';
       }
     },
     async handleLogout() {
       try {
         await coreServices.userLogout();
         this.userId = null;
-        this.$forceUpdate(); // Force re-render
         this.$router.push('/');
+        this.$router.go(0); // Reload the page
       } catch (error) {
         console.error('Logout error:', error);
       }

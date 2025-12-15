@@ -14,7 +14,6 @@ const searchItem = (req, res) => {
     return res.status(400).json({ error_message: error.details[0].message });
   }
 
-  // Check if status requires authentication
   if (value.status && !req.user_id) {
     return res.status(400).json({ error_message: 'Authentication required for status filter' });
   }
@@ -37,37 +36,32 @@ const createItem = (req, res) => {
   const creator_id = req.user_id;
 
   const schema = Joi.object({
-      name: Joi.string().min(1).max(100).required(),
-      description: Joi.string().min(2).max(1000).required(),
-      starting_bid: Joi.number().min(1).required(),
-      start_date: Joi.date(),
-      end_date: Joi.date().greater('now').required(),
-    });
-
-    
+    name: Joi.string().min(1).max(100).required(),
+    description: Joi.string().min(2).max(1000).required(),
+    starting_bid: Joi.number().min(1).required(),
+    start_date: Joi.date(),
+    end_date: Joi.date().greater('now').required()
+  });
 
   const { error, value } = schema.validate(req.body, { allowUnknown: false, convert: true });
-    if (error) {
-      console.log('Validation failed:', error.details[0].message);
-      console.log('Request body:', req.body);
-      return res.status(400).json({ error_message: error.details[0].message });
-    };
+  if (error) {
+    return res.status(400).json({ error_message: error.details[0].message });
+  }
 
-    value.creator_id = creator_id;
-    if (value.start_date) {
-      value.start_date = new Date(value.start_date).getTime();
-    } else {
-      value.start_date = Date.now();
+  value.creator_id = creator_id;
+  if (value.start_date) {
+    value.start_date = new Date(value.start_date).getTime();
+  } else {
+    value.start_date = Date.now();
+  }
+  value.end_date = new Date(value.end_date).getTime();
+
+  core.createItem(value, (err, itemId) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to create item' });
     }
-    value.end_date = new Date(value.end_date).getTime();
-
-    core.createItem(value, (err, itemId) => {
-        if (err) {
-            console.error('DB insert error:', err && err.message ? err.message : err);
-            return res.status(500).json({ error: 'Failed to create item' });
-        }
-        return res.status(201).json({ item_id: itemId, name: value.name});
-    });
+    return res.status(201).json({ item_id: itemId, name: value.name });
+  });
 };
 
 
@@ -103,18 +97,18 @@ const placeBid = (req, res) => {
       });
     });
   });
-}
+};
 
 const getItemDetailsByID = (req, res) => {
   const itemId = parseInt(req.params.itemId, 10);
   if (Number.isNaN(itemId)) return res.status(400).json({ error_message: 'invalid item id' });
- 
+
   core.getItemDetailsByID(itemId, (err, itemDetails) => {
     if (err) return res.sendStatus(500);
     if (!itemDetails) return res.sendStatus(404);
     return res.status(200).json(itemDetails);
   });
-}
+};
 
 const getBidsForItem = (req, res) => {
   const itemId = parseInt(req.params.itemId, 10);
@@ -129,7 +123,7 @@ const getBidsForItem = (req, res) => {
       return res.status(200).json(bids);
     });
   });
-}
+};
 
 module.exports = {
   searchItem: searchItem,
@@ -137,4 +131,4 @@ module.exports = {
   placeBid: placeBid,
   getItemDetailsByID: getItemDetailsByID,
   getBidsForItem: getBidsForItem
-}
+};

@@ -13,7 +13,7 @@
             <br /><br />
 
             <label for="status">Status: </label>
-            <select name="status" v-model="status">
+            <select id="statusFilter" v-model="status">
                 <option value="">All</option>
                 <option value="BID">Bid</option>
                 <option value="OPEN">Open</option>
@@ -25,19 +25,22 @@
             <button>Search</button>
         </form>
 
+        <p v-if="statusError" class="error-text">{{ statusError }}</p>
+
         <div v-if="searchResults.length > 0">
             <h3>Search Results ({{ searchResults.length }} items)</h3>
-            <ul>
-                <li v-for="item in searchResults" :key="item.item_id">
-                    <strong>{{ item.name }}</strong> (ID: {{ item.item_id }})
+            <div v-for="item in searchResults" :key="item.item_id" class="item-card">
+                <h3>{{ item.name }}</h3>
+                <p><strong>Item ID:</strong> {{ item.item_id }}</p>
+                <p>{{ item.description }}</p>
+                <p>
+                    <strong>Created by:</strong> {{ item.first_name }} {{ item.last_name }}
                     <br />
-                    {{ item.description }}
-                    <br />
-                    <em>Created by: {{ item.first_name }} {{ item.last_name }}</em>
-                    <br />
-                    <em>Ends: {{ new Date(item.end_date).toLocaleString() }}</em>
-                </li>
-            </ul>
+                    <strong>Ends:</strong> {{ new Date(item.end_date).toLocaleString() }}
+                </p>
+                <button @click="viewItem(item.item_id)">View & Bid</button>
+                <button @click="viewQuestions(item.item_id)">Questions</button>
+            </div>
         </div>
 
         <div v-else-if="searched">
@@ -56,11 +59,27 @@ import { coreServices } from '../../services/core.services.js';
                 status: "",
                 searchResults: [],
                 searched: false,
+                statusError: null
+            }
+        },
+
+        computed: {
+            isLoggedIn() {
+                return localStorage.getItem('session_token') !== null;
             }
         },
 
         methods: {
             async handleSearch() {
+                this.statusError = null;
+                
+                if (this.status && !this.isLoggedIn) {
+                    this.statusError = "You must be logged in to use status filters (BID, OPEN, ARCHIVE).";
+                    this.searchResults = [];
+                    this.searched = false;
+                    return;
+                }
+                
                 try {
                     const queryParams = {};
                     if (this.query) queryParams.q = this.query;
@@ -76,6 +95,15 @@ import { coreServices } from '../../services/core.services.js';
                     this.searchResults = [];
                     this.searched = false;
                 }
+            },
+
+            viewItem(itemId) {
+                sessionStorage.setItem('currentItemId', itemId);
+                this.$router.push('/get-item');
+            },
+
+            viewQuestions(itemId) {
+                this.$router.push(`/item/${itemId}/questions`);
             }
         }
     }   

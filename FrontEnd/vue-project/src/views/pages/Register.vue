@@ -2,7 +2,9 @@
     <div class="container">
         <h1>Create Account</h1>
         
-        <form @submit.prevent="handleRegister">
+        <p v-if="isLoggedIn"><em>You are already logged in.</em></p>
+
+        <form v-else @submit.prevent="handleRegister">
             <div>
                 <label for="first_name">First Name:</label><br />
                 <input type="text" id="first_name" v-model="formData.first_name" required />
@@ -36,11 +38,11 @@
             <button type="submit">Create Account</button>
         </form>
 
-        <div v-if="error" style="color: red; margin-top: 20px;">
+        <div v-if="error" class="error-message">
             <strong>Error:</strong> {{ error }}
         </div>
 
-        <div v-if="success" style="color: #42b983; margin-top: 20px;">
+        <div v-if="success" class="success-message">
             <strong>Success!</strong> Account created. <router-link to="/login">Login here</router-link>
         </div>
     </div>
@@ -62,6 +64,11 @@ export default {
             success: false
         }
     },
+    computed: {
+        isLoggedIn() {
+            return localStorage.getItem('session_token') !== null;
+        }
+    },
     methods: {
         async handleRegister() {
             this.error = null;
@@ -71,7 +78,6 @@ export default {
                 const response = await coreServices.createUser(this.formData);
                 console.log('User created:', response);
                 this.success = true;
-                // Reset form
                 this.formData = {
                     first_name: '',
                     last_name: '',
