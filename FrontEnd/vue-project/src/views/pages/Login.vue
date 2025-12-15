@@ -1,30 +1,29 @@
 <template>
-  <div>
+  <div class="container">
     <h1>Login</h1>
     <form @submit.prevent="handleSubmit">
-        <label for="email">Email: </label>
-        <input type="text" name="email" v-model="email"/>
-        <div v-show="submitted && !email"> Email is required</div>
+        <div>
+          <label for="email">Email:</label><br />
+          <input type="text" id="email" name="email" v-model="email"/>
+          <div v-show="submitted && !email" class="error-text">Email is required</div>
+        </div>
 
-        <br /><br />
+        <br />
 
-        <label for="password">Password: </label>
-        <input type="password" name="password" v-model="password"/>
-        <div v-show="submitted && !password"> Password is required</div>
+        <div>
+          <label for="password">Password:</label><br />
+          <input type="password" id="password" name="password" v-model="password"/>
+          <div v-show="submitted && !password" class="error-text">Password is required</div>
+        </div>
 
-        <br /><br />
-        <p>{{ email+" "+password }}</p>
+        <br />
 
-        <button>Login</button>
-
+        <button type="submit">Login</button>
     </form>
 
-    <div v-if="error">
-      {{ error }}
+    <div v-if="error" style="color: red; margin-top: 20px;">
+      <strong>Error:</strong> {{ error }}
     </div>
-
-
-
   </div>
 </template>
 
@@ -74,11 +73,6 @@ import { coreServices } from '../../services/core.services';
       }
     }
   }
-    
-
-
-  
-
 </script>
 
 <style scoped>

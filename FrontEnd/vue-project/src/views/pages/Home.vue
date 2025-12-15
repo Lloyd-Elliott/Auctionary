@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <div class="container">
         <h1>Home Page</h1>
         <p>Welcome to the Auctionary application!</p>
-    </div>
-    <br/> <br/>
-    <div>
+    
+        <br/> <br/>
+        
         <h2>Search Item</h2>
         <form @submit.prevent="handleSearch">
             <label for="query">Search Query: </label>

@@ -20,7 +20,13 @@ const searchItem = (queryParams = {}) => {
     const queryString = new URLSearchParams(queryParams).toString();
     const url = queryString ? `http://localhost:3333/search?${queryString}` : 'http://localhost:3333/search';
     
-    return fetch(url)
+    const session_token = localStorage.getItem('session_token');
+    const headers = {};
+    if (session_token) {
+        headers['X-Authorization'] = session_token;
+    }
+    
+    return fetch(url, { headers })
         .then((response) => {
             if(response.status === 200){
                 return response.json();
@@ -105,9 +111,64 @@ const userLogout = () => {
         }); 
 }
 
+const createUser = (userData) => {
+    return fetch('http://localhost:3333/users', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData)
+    })
+        .then((response) => {
+            if(response.status === 201){
+                return response.json();
+            } else {
+                return response.json().then(err => {
+                    throw err.error_message || 'User creation failed';
+                });
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            return Promise.reject(error);
+        }); 
+}
+
+const createItem = (itemData) => {
+    const session_token = localStorage.getItem('session_token');
+    
+    if (!session_token) {
+        return Promise.reject('Must be logged in to create an item');
+    }
+
+    return fetch('http://localhost:3333/item', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Authorization': session_token
+        },
+        body: JSON.stringify(itemData)
+    })
+        .then((response) => {
+            if(response.status === 201){
+                return response.json();
+            } else {
+                return response.json().then(err => {
+                    throw err.error_message || 'Failed to create item';
+                });
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            return Promise.reject(error);
+        }); 
+}
+
 export const coreServices = {
     getItemById,
     searchItem,
     userLogin,
     userLogout,
+    createUser,
+    createItem,
 };
